@@ -49,10 +49,7 @@ def bla(k=k,trainx=trainx,trainy=trainy,testx=testx,testy=testy,y_test=y_test):
             tab=[0]*3
             for q in range(k):
                 tab[jakie_odleglosci[i][q][1]]+=1
-            print(tab)
             tab=licz(k,tab,jakie_odleglosci[i])
-            print(tab)
-            print("pause")
             ile_wystapien.append(tab)
     '''sprawdzanie poprawności przewidywań'''
     p=0
