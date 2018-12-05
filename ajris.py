@@ -2,21 +2,22 @@ from sklearn.datasets import load_iris
 from sklearn.model_selection import train_test_split
 from math import fabs, sqrt, pow
 import numpy as np
+
 '''wybór największej wartości dla k>1'''
-def licz(k,tab,length):
+def licz(k,tab,jakie_odleglosci):
     maks=max(tab)
     v=0
     for m in range(len(tab)):
         if maks==tab[m]:
             v+=1
-        if v==2 and k>1:
-            k-=1
-            for q in range(k-1):
-                tab[length[q][1]]+=1
-            return licz(k,tab,length)
-        else:
-            return tab
-
+    if v==2 and k>1:
+        k-=1
+        tabpom=[0]*3
+        for q in range(k):
+            tabpom[jakie_odleglosci[q][1]]+=1
+        return licz(k,tabpom,jakie_odleglosci)
+    else:
+        return tab
 
 '''data load'''
 iris_data= load_iris()
@@ -32,28 +33,31 @@ trainy=[i[1] for i in X_train]
 testx=[i[0] for i in X_test]
 testy=[i[1] for i in X_test]
 
-'''wyliczanie odległości i sort'''
+'''wyliczanie odległości i sortowanie'''
 def bla(k=k,trainx=trainx,trainy=trainy,testx=testx,testy=testy,y_test=y_test):
-    what=[]
-    length=[]
+    ile_wystapien=[]
+    jakie_odleglosci=[]
     for i in range(len(testx)):
-        length.append([])
+        jakie_odleglosci.append([])
         for y in range(len(trainx)):
-            length[i].append([fabs(sqrt(pow(trainx[y]-testx[i],2)+pow(trainy[y]-testy[i],2))),y_train[y]])
-        length[i].sort()
-        '''wybór największej wartości'''
-        tab=[0]*k
+            jakie_odleglosci[i].append([fabs(sqrt(pow(trainx[y]-testx[i],2)+pow(trainy[y]-testy[i],2))),y_train[y]])
+        jakie_odleglosci[i].sort()
+        '''wybór klasyfikatora najczęściej występującego '''
         if k==1:
-            what.append(length[i][0][1])
+            ile_wystapien.append(jakie_odleglosci[i][0][1])
         else:
+            tab=[0]*3
             for q in range(k):
-                tab[length[i][q][1]]+=1
-            tab=licz(k,tab,length[i])
-            what.append(tab)
-
+                tab[jakie_odleglosci[i][q][1]]+=1
+            print(tab)
+            tab=licz(k,tab,jakie_odleglosci[i])
+            print(tab)
+            print("pause")
+            ile_wystapien.append(tab)
+    '''sprawdzanie poprawności przewidywań'''
     p=0
     for i in range(len(y_test)):
-        a=np.argmax(what[i])
+        a=np.argmax(ile_wystapien[i])
         if a==y_test[i]:
             p+=1
     return round(p/len(y_test),2)
