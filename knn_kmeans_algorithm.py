@@ -1,55 +1,24 @@
 import random
 from math import fabs, sqrt, pow
-
 import scipy
 import numpy as np
 import matplotlib.pyplot as plt
-from sklearn.datasets import load_iris,load_breast_cancer
-from sklearn.model_selection import train_test_split
 from sklearn.metrics import confusion_matrix, accuracy_score
-"""
-'''data load'''
-breast_data = load_breast_cancer()
-data = breast_data['data']
-target = breast_data['target']
-data,data_test,target,target_test = train_test_split(data,target,random_state=42)
-'''data split'''
-feature_1_train = [i[0] for i in data]
-feature_2_train = [i[3] for i in data]
-feature_1_test = [i[0] for i in data_test]
-feature_2_test = [i[3] for i in data_test]
-feature_1 = [i[0] for i in data]
-feature_2 = [i[3] for i in data]
-"""
-'''data load'''
-iris_data = load_iris()
-data = iris_data['data']
-target = iris_data['target']
-data,data_test,target,target_test = train_test_split(data,target,random_state=42)
-
-'''data split'''
-feature_1_train = [i[0] for i in data]
-feature_2_train = [i[1] for i in data]
-feature_1_test = [i[0] for i in data_test]
-feature_2_test = [i[1] for i in data_test]
-
-feature_1 = [i[0] for i in data]
-feature_2 = [i[1] for i in data]
-
 
 class Knn:
     '''class predicting method'''
     def predict(
     self,
     k,
-    feature_1_test=feature_1_test,
-    feature_2_test=feature_2_test,
-    feature_1_train=feature_1_train,
-    feature_2_train=feature_2_train,
-    target_test=target_test
+    feature_1_test,
+    feature_2_test,
+    feature_1_train,
+    feature_2_train,
+    target_test,
+    target
     ):
         '''method that predicts elements in given neighbourhood'''
-        def count_distances(k,arr,distances):
+        def count_distances(k,arr,distances,target):
             my_max = max(arr)
             v = 0
             for m in range(len(arr)):
@@ -60,7 +29,7 @@ class Knn:
                 ass_arr = [0]*len(set(target))
                 for q in range(k):
                     ass_arr[distances[q][1]] += 1
-                return count_distances(k,ass_arr,distances)
+                return count_distances(k,ass_arr,distances,target)
             else:
                 return arr
         appeareance_count = []
@@ -83,7 +52,7 @@ class Knn:
                 arr = [0]*len(set(target))
                 for q in range(k):
                     arr[distances[i][q][1]] += 1
-                arr = count_distances(k,arr,distances[i])
+                arr = count_distances(k,arr,distances[i],target)
                 appeareance_count.append(arr)
         '''returning most frequent appearing classes for given k-neighbourhood'''
         return_predictions = []
@@ -95,9 +64,10 @@ class Knn:
     self,
     k,
     input_coord,
-    feature_1_train=feature_1_train,
-    feature_2_train=feature_2_train,
-    target_test=target_test
+    feature_1_train,
+    feature_2_train,
+    target_test,
+    target
     ):
         distances = []
         for y in range(len(feature_1_train)):
@@ -137,7 +107,7 @@ class Kmeans(object):
     def __init__(self):
         self = self
     '''determining centroids and clusters'''
-    def fit(self,k,feature_1=feature_1,feature_2=feature_2,target=target):
+    def fit(self,k,feature_1,feature_2,target):
         def determining_centroids(k,centr_n_clust,feature_1,feature_2,target):
             centr_n_clust[-1] = 0
             centr_n_clust[-2] = 0
@@ -224,10 +194,3 @@ class Kmeans(object):
             plt.scatter(centroids_x[i],centroids_y[i],c="r")
         plt.tight_layout()
         plt.show()
-
-model = Knn()
-a=model.predict(6)
-model.visualize(9,[6,3.5])
-model2 = Kmeans()
-model2.fit(3)
-model2.visualize()
